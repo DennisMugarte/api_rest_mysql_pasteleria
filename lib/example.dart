@@ -1,4 +1,4 @@
-import 'dart:convert' show jsonDecode;
+import 'dart:convert' show jsonDecode, jsonEncode;
 import 'dart:math';
 import 'package:api_rest_mysql_pasteleria/model/bd_pastel.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,6 +18,14 @@ class _MyApiState extends State<MyApi> {
   late Future<List<PastelDb>> user;
   final name = TextEditingController();
   final sabor = TextEditingController();
+  final dibujo = TextEditingController();
+  final color = TextEditingController();
+  final especial = TextEditingController();
+  final precio = TextEditingController();
+  final tamano = TextEditingController();
+  final forma = TextEditingController();
+  final galleta_o_pan = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -79,9 +87,9 @@ class _MyApiState extends State<MyApi> {
         builder: (context) {
           return AlertDialog(
             title: const Text("Agregar Usuario"),
-            content: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
+            content: ListView(
+              // mainAxisAlignment: MainAxisAlignment.center,
+              // mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: name,
@@ -93,7 +101,36 @@ class _MyApiState extends State<MyApi> {
                   // keyboardType: TextInputType.emailAddress,
                   controller: sabor,
                   decoration: const InputDecoration(hintText: "Sabor"),
-                )
+                ),
+                TextField(
+                  controller: dibujo,
+                  decoration: const InputDecoration(hintText: "Dibujo"),
+                ),
+                TextField(
+                  controller: color,
+                  decoration:
+                      const InputDecoration(hintText: "Color del pastel"),
+                ),
+                TextField(
+                  controller: especial,
+                  decoration: const InputDecoration(hintText: "Algo especial"),
+                ),
+                TextField(
+                  controller: precio,
+                  decoration: const InputDecoration(hintText: "Precio"),
+                ),
+                TextField(
+                  controller: tamano,
+                  decoration: const InputDecoration(hintText: "Tamaños"),
+                ),
+                TextField(
+                  controller: forma,
+                  decoration: const InputDecoration(hintText: "Forma"),
+                ),
+                TextField(
+                  controller: galleta_o_pan,
+                  decoration: const InputDecoration(hintText: "Pan o Galleta"),
+                ),
               ],
             ),
             actions: [
@@ -105,6 +142,7 @@ class _MyApiState extends State<MyApi> {
               ),
               TextButton(
                 onPressed: () {
+                  savePastelDb();
                   Navigator.of(context).pop();
                 },
                 child: const Text("Guardar"),
@@ -123,9 +161,42 @@ class _MyApiState extends State<MyApi> {
 //   List<PastelDb> userTwo = [];
 //   jsonBody.forEach((element) {
 //     final PastelDb user1 = PastelDb.fromJson(element);
+//    userTwo.add(user1);
 //   });
 //   return userTwo;
 // }
+
+  void savePastelDb() async {
+    final user_json = {
+      "nombre": name.text,
+      "sabor": sabor.text,
+      "dibujo": dibujo.text,
+      "color": color.text,
+      "especial": especial.text,
+      "precio": precio.text,
+      "tamano": tamano.text,
+      "forma": forma.text,
+      "galleta_o_pan": galleta_o_pan.text
+    };
+    final headers = {"Content-Type": "application/json;charset=UTF-8"};
+    await http.post(
+        Uri.parse(
+            "https://restapilogin-production.up.railway.app/api/pasteria&daniel&el&travieso/pastel"),
+        headers: headers,
+        body: jsonEncode(user_json));
+    name.clear();
+    sabor.clear();
+    dibujo.clear();
+    color.clear();
+    especial.clear();
+    precio.clear();
+    tamano.clear();
+    forma.clear();
+    galleta_o_pan.clear();
+    setState(() {
+      user = getPastelDb();
+    });
+  }
 }
 
 Future<List<PastelDb>> getPastelDb() async {
@@ -138,7 +209,7 @@ Future<List<PastelDb>> getPastelDb() async {
     final PastelDb admin = PastelDb.fromJson(element);
     user.add(admin);
   }
-  return user;
+  return user.reversed.toList();
 }
 
 //* Example Two
